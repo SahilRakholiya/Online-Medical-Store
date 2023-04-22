@@ -8,6 +8,10 @@ const medicineSchema = new mongoose.Schema({
     medicine_image:{
         type:String,
         required:true
+    },
+    amount:{
+        type:Number,
+        required:true
     }
 },{"versionKey":false});
 

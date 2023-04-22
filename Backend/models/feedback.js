@@ -18,4 +18,4 @@ const feedbackSchema = new mongoose.Schema({
 
 },{"versionKey":false});
 
-module.exports = mongoose.model('orders',orderSchema);
+module.exports = mongoose.model('feedbacks',feedbackSchema);

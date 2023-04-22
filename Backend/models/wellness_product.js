@@ -11,6 +11,10 @@ const wellnessProductSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    amount:{
+        type:Number,
+        required:true
+    },
     wellness_category_id:{
         type:mongoose.Schema.Types.ObjectId,
         required:true,

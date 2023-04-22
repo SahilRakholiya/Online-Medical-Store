@@ -1,5 +1,6 @@
 const wellnessProductModel=require('../models/wellness_product');
 const wellnessCategoryModel=require('../models/wellness_category');
+const cartModel=require('../models/cart');
 
 const fs= require('fs');
 const path=require('path');
@@ -13,8 +14,14 @@ exports.displayWellnessProduct=async(req,resp)=>{
         const all_products=well_product.map(products=>({
             _id:products._id,
             product_name:products.wellness_product_name,
-            wellness_category_name:products.wellness_category_id.wellness_category_name
+            wellness_category_name:products.wellness_category_id.wellness_category_name,
+            image_name:products.wellness_image,
+            i_path: path.join(__dirname, '../', 'uploads', 'wellness_product', products.wellness_image)
         }))
+        if(all_products=="")
+        {
+            return resp.status(400).send({message:"Wellness Product not found"});
+        }
 
         resp.status(200).send(all_products);
 
@@ -71,6 +78,7 @@ exports.insertWellnessProduct=async(req,resp)=>{
         const newwell_product=new wellnessProductModel({
             wellness_product_name:well_product.product_name,
             wellness_image:image_name,
+            amount:well_product.amount,
             wellness_category_id:cat_name._id
         })
 
@@ -115,6 +123,9 @@ exports.updateWellnessProduct=async (req,resp)=>{
 exports.deleteWellnessProduct=async(req,resp)=>{
     try{
         const well_product_id=req.params.id;
+        const cart_find=await cartModel.findOne({wellness_product_id:req.params.id});
+        
+
         const well_product_name=await wellnessProductModel.findOne({_id:well_product_id});
         // fs.unlinkSync(well_product_image);
 
@@ -122,9 +133,14 @@ exports.deleteWellnessProduct=async(req,resp)=>{
         {
             return resp.status(400).send({message:"Wellness Product not found"});
         }
+        if(cart_find!=null)
+        {
+            await cartModel.deleteMany({wellness_product_id:req.params.id});
+        }
+
         const well_product_image=well_product_name.wellness_image;
         const i_path=path.join(__dirname,'../','uploads','wellness_product',well_product_image);
-        console.log(i_path);
+        // console.log(i_path);
         fs.unlink(i_path,(err)=>{
             if(err)
             {

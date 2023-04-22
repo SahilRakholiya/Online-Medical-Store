@@ -22,7 +22,7 @@ const upload=multer({storage});
 const {displayWellnessProduct,insertWellnessProduct,updateWellnessProduct,deleteWellnessProduct,searchWellnessProduct}=require('../controllers/wellnessProductControllers');
 
 routes.get('/display',displayWellnessProduct);
-routes.get('/delete/:id',deleteWellnessProduct);
+routes.delete('/delete/:id',deleteWellnessProduct);
 routes.post('/insert',upload.single("user_file"),insertWellnessProduct);
 routes.put('/update/:id',updateWellnessProduct);
 routes.get('/search/:pname',searchWellnessProduct);

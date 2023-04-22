@@ -1,5 +1,5 @@
 const express=require('express');
-// const Time=require('Time');
+
 const routes=express.Router();
 
 // image insert
@@ -22,7 +22,7 @@ const upload=multer({storage});
 const {displayBeautyProduct,insertBeautyProduct,updateBeautyProduct,deleteBeautyProduct,searchBeautyProduct}=require('../controllers/beautyProductControllers');
 
 routes.get('/display',displayBeautyProduct);
-routes.get('/delete/:id',deleteBeautyProduct);
+routes.delete('/delete/:id',deleteBeautyProduct);
 routes.post('/insert',upload.single("user_file"),insertBeautyProduct);
 routes.put('/update/:id',updateBeautyProduct);
 routes.get('/search/:pname',searchBeautyProduct);

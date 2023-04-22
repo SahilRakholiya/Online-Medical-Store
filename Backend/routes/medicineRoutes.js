@@ -4,19 +4,21 @@ const routes=express.Router();
 
 // image insert
 const multer=require('multer');
+const temp=require('uuid');
 
 const storage=multer.diskStorage({
     destination:function(req,file,cb)
     {
-        cb(null,"./uploads")
+        cb(null,"./uploads/medicine");
     },
     filename:function(req,file,cb)
     {
-        cb(null,file.originalname)
+        // cb(null,file.fieldname+"-"+Date.now()+".jpg")
+        cb(null, temp.v4()+file.originalname);
     }
 });
-
 const upload=multer({storage});
+
 
 
 const {displaymedicine,insertmedicine,updatemedicine,deletemedicine,searchmedicine}=require('../controllers/medicineControllers');

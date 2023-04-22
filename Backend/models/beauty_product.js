@@ -10,6 +10,10 @@ const beautyProductSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    amount:{
+        type:Number,
+        required:true
+    },
     beauty_category_id:{
         type:mongoose.Schema.Types.ObjectId,
         required:true,
