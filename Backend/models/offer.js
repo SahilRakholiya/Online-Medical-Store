@@ -22,15 +22,15 @@ const offerSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
-    description:{
+        description:{
         type:String,
         required:true
     }
-    // ,
-    // image:{
-    //     type:String,
-    //     required:true
-    // }
+    ,
+    offer_image:{
+        type:String,
+        required:true
+    }
 
 
 },{"versionKey":false});

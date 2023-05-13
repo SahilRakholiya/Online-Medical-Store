@@ -3,8 +3,6 @@ const userModel = require('../models/user');
 const medicineModel = require('../models/medicine');
 const wellnessProductModel = require('../models/wellness_product');
 const beautyProductModel = require('../models/beauty_product');
-const cart = require('../models/cart');
-const user = require('../models/user');
 
 
 

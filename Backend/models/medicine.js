@@ -12,6 +12,10 @@ const medicineSchema = new mongoose.Schema({
     amount:{
         type:Number,
         required:true
+    },
+    company:{
+        type:String,
+        required:true
     }
 },{"versionKey":false});
 

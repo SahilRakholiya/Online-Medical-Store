@@ -24,7 +24,7 @@ const {displayBeautyProduct,insertBeautyProduct,updateBeautyProduct,deleteBeauty
 routes.get('/display',displayBeautyProduct);
 routes.delete('/delete/:id',deleteBeautyProduct);
 routes.post('/insert',upload.single("user_file"),insertBeautyProduct);
-routes.put('/update/:id',updateBeautyProduct);
+routes.put('/update/:id',upload.single("user_file"),updateBeautyProduct);
 routes.get('/search/:pname',searchBeautyProduct);
 
 module.exports =routes;

@@ -24,7 +24,7 @@ const {displayWellnessProduct,insertWellnessProduct,updateWellnessProduct,delete
 routes.get('/display',displayWellnessProduct);
 routes.delete('/delete/:id',deleteWellnessProduct);
 routes.post('/insert',upload.single("user_file"),insertWellnessProduct);
-routes.put('/update/:id',updateWellnessProduct);
+routes.put('/update/:id',upload.single("user_file"),updateWellnessProduct);
 routes.get('/search/:pname',searchWellnessProduct);
 
 module.exports =routes;

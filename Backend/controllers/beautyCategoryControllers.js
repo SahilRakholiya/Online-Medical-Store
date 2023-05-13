@@ -55,7 +55,12 @@ exports.updateBeautyCategory = async (req, resp) => {
 
         const beauty_cat_search = await beautyCategoryModel.findOne({ _id: beauty_cat_id });
 
+        const check_find_name=await beautyCategoryModel.findOne({beauty_category_name:req.body.cat_name});
 
+        if(check_find_name)
+        {
+            return resp.status(400).send({ message: "Please enter unique beauty category name" });
+        }
         if (!beauty_cat_search) {
             return resp.status(400).send({ message: "Beauty Category not found" });
         }

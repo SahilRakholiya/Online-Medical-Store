@@ -68,6 +68,15 @@ exports.updateWellnessCategory=async (req,resp)=>{
         {
             return resp.status(400).send({message:"Wellness Category not found"});
         }
+
+        
+        const check_find_name=await wellnessCategoryModel.findOne({wellness_category_name:req.body.cat_name});
+
+        if(check_find_name)
+        {
+            return resp.status(400).send({ message: "Please enter unique Wellness category name" });
+        }
+
         wellnessCategoryModel.updateOne({_id:well_cat_id},{
             $set:{
                 wellness_category_name:req.body.cat_name

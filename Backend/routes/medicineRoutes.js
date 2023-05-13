@@ -26,7 +26,7 @@ const {displaymedicine,insertmedicine,updatemedicine,deletemedicine,searchmedici
 routes.get('/display',displaymedicine);
 routes.delete('/delete/:id',deletemedicine);
 routes.post('/insert',upload.single("user_file"),insertmedicine);
-routes.put('/update/:id',updatemedicine);
+routes.put('/update/:id',upload.single("user_file"),updatemedicine);
 routes.get('/search/:mname',searchmedicine);
 
 module.exports =routes;

@@ -5,7 +5,6 @@ const beautyProductModel = require('../models/beauty_product');
 
 const fs = require('fs');
 const path = require('path');
-const offer = require('../models/offer');
 
 exports.displayoffer = async (req, resp) => {
     try {
@@ -14,7 +13,7 @@ exports.displayoffer = async (req, resp) => {
             .populate('medicine_id', 'medicine_name')
             .populate('wellness_product_id', 'wellness_product_name')
             .populate('beauty_product_id', 'beauty_product_name')
-            .select('_id medicine_id wellness_product_id beauty_product_id offer_code percentage description');
+            .select('_id medicine_id wellness_product_id beauty_product_id offer_code percentage description offer_image');
 
         if (offer == "") {
             return resp.status(400).send({ message: "No offer Available" });
@@ -26,7 +25,9 @@ exports.displayoffer = async (req, resp) => {
                     medicine_name: offer.medicine_id.medicine_name,
                     offer_code: offer.offer_code,
                     percentage: offer.percentage,
-                    description: offer.description
+                    description: offer.description,
+                    offer_image: offer.offer_image,
+                    i_path: path.join(__dirname, '../', 'uploads', 'offer', offer.offer_image)
                 }
             }
             else {
@@ -36,7 +37,9 @@ exports.displayoffer = async (req, resp) => {
                         wellness_product_name: offer.wellness_product_id.wellness_product_name,
                         offer_code: offer.offer_code,
                         percentage: offer.percentage,
-                        description: offer.description
+                        description: offer.description,
+                        offer_image: offer.offer_image,
+                        i_path: path.join(__dirname, '../', 'uploads', 'offer', offer.offer_image)
 
                     }
                 else {
@@ -46,7 +49,9 @@ exports.displayoffer = async (req, resp) => {
                             beauty_product_name: offer.beauty_product_id.beauty_product_name,
                             offer_code: offer.offer_code,
                             percentage: offer.percentage,
-                            description: offer.description
+                            description: offer.description,
+                            offer_image: offer.offer_image,
+                            i_path: path.join(__dirname, '../', 'uploads', 'offer', offer.offer_image)
                         }
                 }
             }
@@ -70,21 +75,44 @@ exports.displayoffer = async (req, resp) => {
 exports.insertoffer = async (req, resp) => {
     try {
         const offer = req.body;
-        // const image_name=req.file.filename
+        let image_name = "";
+        if (req.file) {
+            image_name = req.file.filename;
+        } else {
+            return resp.status(400).send({ message: "Please upload the images " });
+        }
+
         const newoffer = new offerModel({
             offer_code: offer.offer_code,
             percentage: offer.percentage,
-            description: offer.description
+            description: offer.description,
+            offer_image: image_name
         })
 
         if ((offer.medicine_name && offer.wellness_product_name) || (offer.wellness_product_name && offer.beauty_product_name) || (offer.beauty_product_name && offer.medicine_name)) {
+            // image remove from the folder because error is generated
+            const i_path = path.join(__dirname, '../', 'uploads', 'offer', image_name)
+            // console.log(i_path);
+            fs.unlink(i_path, (err) => {
+                if (err) {
+                    return resp.status(400).send({ message: err });
+                }
+            });
+
             return resp.status(400).send({ message: "Please enter only medicine name or wellness product name or beauty product name" });
         }
 
         if (offer.medicine_name) {
             const medicine = await medicineModel.findOne({ medicine_name: offer.medicine_name });
-            if(medicine==null)
-            {
+            if (medicine == null) {
+                // image remove from the folder because error is generated
+                const i_path = path.join(__dirname, '../', 'uploads', 'offer', image_name)
+                fs.unlink(i_path, (err) => {
+                    if (err) {
+                        return resp.status(400).send({ message: err });
+                    }
+                });
+
                 return resp.status(400).send({ message: "Medicine Not found " });
             }
             // console.log(medicine._id);
@@ -94,8 +122,14 @@ exports.insertoffer = async (req, resp) => {
 
         if (offer.wellness_product_name) {
             const wellness_product = await wellnessProductModel.findOne({ wellness_product_name: offer.wellness_product_name });
-            if(wellness_product==null)
-            {
+            if (wellness_product == null) {
+                // image remove from the folder because error is generated
+                const i_path = path.join(__dirname, '../', 'uploads', 'offer', image_name)
+                fs.unlink(i_path, (err) => {
+                    if (err) {
+                        return resp.status(400).send({ message: err });
+                    }
+                });
                 return resp.status(400).send({ message: "Wellness Product Not found " });
             }
 
@@ -105,8 +139,15 @@ exports.insertoffer = async (req, resp) => {
 
         if (offer.beauty_product_name) {
             const beauty_product = await beautyProductModel.findOne({ beauty_product_name: offer.beauty_product_name });
-            if(beauty_product==null)
-            {
+            if (beauty_product == null) {
+
+                // image remove from the folder because error is generated
+                const i_path = path.join(__dirname, '../', 'uploads', 'offer', image_name)
+                fs.unlink(i_path, (err) => {
+                    if (err) {
+                        return resp.status(400).send({ message: err });
+                    }
+                });
                 return resp.status(400).send({ message: "Beauty Product Not found " });
             }
 
@@ -129,49 +170,93 @@ exports.updateoffer = async (req, resp) => {
     try {
         const offer_id = req.params.id;
         const offer_data = req.body;
+        let image_name = "";
+        if (req.file) {
+            image_name = req.file.filename;
+        }
+
         const offer_search = await offerModel.findOne({ _id: offer_id });
 
         if (!offer_search) {
+            if (req.file) {
+                // image remove from the folder because error is generated
+                const i_path = path.join(__dirname, '../', 'uploads', 'offer', image_name)
+                fs.unlink(i_path, (err) => {
+                    if (err) {
+                        return resp.status(400).send({ message: err });
+                    }
+                });
+
+            }
             return resp.status(400).send({ message: "offer not found" });
         }
 
+        // 1.
         const filter = { _id: offer_id };
         const update = { $set: {} };
 
         if (offer_data.medicine_name) {
             const medicine = await medicineModel.findOne({ medicine_name: offer_data.medicine_name })
-            if(!medicine)
-            {
+            if (!medicine) {
+
+                if (req.file) {
+                    // image remove from the folder because error is generated
+                    const i_path = path.join(__dirname, '../', 'uploads', 'offer', image_name)
+                    fs.unlink(i_path, (err) => {
+                        if (err) {
+                            return resp.status(400).send({ message: err });
+                        }
+                    });
+
+                }
+
                 return resp.status(400).send({ message: "medicine not found" });
             }
 
-            update.$unset={'wellness_product_id':'','beauty_product_id':''};
+            update.$unset = { 'wellness_product_id': '', 'beauty_product_id': '' };
             // update.$unset={'beauty_product_id':''};
-            update.$set.medicine_id=medicine._id;
+            update.$set.medicine_id = medicine._id;
         }
 
         if (offer_data.wellness_product_name) {
-            const wellness_product =await wellnessProductModel.findOne({ wellness_product_name: offer_data.wellness_product_name })
+            const wellness_product = await wellnessProductModel.findOne({ wellness_product_name: offer_data.wellness_product_name })
 
-            if(!wellness_product)
-            {
+            if (!wellness_product) {
+                if (req.file) {
+                    // image remove from the folder because error is generated
+                    const i_path = path.join(__dirname, '../', 'uploads', 'offer', image_name)
+                    fs.unlink(i_path, (err) => {
+                        if (err) {
+                            return resp.status(400).send({ message: err });
+                        }
+                    });
+                }
+
                 return resp.status(400).send({ message: "wellness_product not found" });
             }
 
-            update.$unset={'medicine_id':'','beauty_product_id':''};
+            update.$unset = { 'medicine_id': '', 'beauty_product_id': '' };
             // update.$unset={'beauty_product_id':''};
             update.$set.wellness_product_id = wellness_product._id;
         }
 
         if (offer_data.beauty_product_name) {
-            const beauty_product =await beautyProductModel.findOne({ beauty_product_name: offer_data.beauty_product_name })
+            const beauty_product = await beautyProductModel.findOne({ beauty_product_name: offer_data.beauty_product_name })
 
-            if(!beauty_product)
-            {
+            if (!beauty_product) {
+                if (req.file) {
+                    // image remove from the folder because error is generated
+                    const i_path = path.join(__dirname, '../', 'uploads', 'offer', image_name)
+                    fs.unlink(i_path, (err) => {
+                        if (err) {
+                            return resp.status(400).send({ message: err });
+                        }
+                    });
+                }
                 return resp.status(400).send({ message: "beauty_product not found" });
             }
 
-            update.$unset={'medicine_id':'','wellness_product_id':''};
+            update.$unset = { 'medicine_id': '', 'wellness_product_id': '' };
             // update.$unset={'wellness_product_id':''};
             update.$set.beauty_product_id = beauty_product._id;
         }
@@ -186,22 +271,29 @@ exports.updateoffer = async (req, resp) => {
         if (offer_data.description) {
             update.$set.description = offer_data.description;
         }
-        
-        const result=await offerModel.updateOne(filter,update);
-        
-        // if(result.modifiedCount==0)
-        // {
-        //     resp.status(200).send({ message: "Data Updated successfully" });
-        // }
-        // else
-        // {
-        //     resp.status(400).send({ message: "Data are not changed" });
-        // }
+        if(req.file)
+        {
+            const i_path = path.join(__dirname, '../', 'uploads', 'offer', offer_search.offer_image)
+            fs.unlink(i_path, (err) => {
+                if (err) {
+                    return resp.status(400).send({ message: err });
+                }
+            });
+            update.$set.offer_image = image_name;
 
-        resp.status(200).send({ message: "Data Updated successfully" });
+        }
+
+        const result = await offerModel.updateOne(filter, update);
+        if (result.modifiedCount == 1) {
+            return resp.status(500).send({ message: "Data updated successfully" });
+        }
+        resp.status(500).send({ message: "Data Not updated" });
+
+        // resp.status(200).send({ message: "Data Updated successfully" });
 
 
-        
+
+        // 2. for example
 
         // const temp = false;
 
@@ -309,20 +401,17 @@ exports.deleteoffer = async (req, resp) => {
         if (offer_find == null) {
             return resp.status(400).send({ message: "offer not found" });
         }
-
+                
 
         const code = offer_find.offer_code;
 
-        // const offer_image_name=offer_find.offer_image;
-
-        // const i_path=path.join(__dirname,'../','uploads','offer',offer_image_name);
-        // // console.log(i_path);
-        // fs.unlink(i_path,(err)=>{
-        //     if(err)
-        //     {
-        //         return resp.status(400).send({message:err});
-        //     }
-        // });
+        const offer_image_name=offer_find.offer_image;
+        const i_path = path.join(__dirname, '../', 'uploads', 'offer',offer_image_name)
+        fs.unlink(i_path, (err) => {
+            if (err) {
+                return resp.status(400).send({ message: err });
+            }
+        });
 
         const offer = await offerModel.deleteOne({ _id: req.params.id });
 
@@ -343,7 +432,7 @@ exports.searchoffer = async (req, resp) => {
             .populate('medicine_id', 'medicine_name')
             .populate('wellness_product_id', 'wellness_product_name')
             .populate('beauty_product_id', 'beauty_product_name')
-            .select('_id medicine_id wellness_product_id beauty_product_id offer_code percentage description');
+            .select('_id medicine_id wellness_product_id beauty_product_id offer_code percentage description offer_image');
 
         if (offer == "") {
             resp.status(400).send({ message: "Offer not found" });
@@ -356,7 +445,9 @@ exports.searchoffer = async (req, resp) => {
                     medicine_name: offer.medicine_id.medicine_name,
                     offer_code: offer.offer_code,
                     percentage: offer.percentage,
-                    description: offer.description
+                    description: offer.description,
+                    offer_image: offer.offer_image,
+                    i_path: path.join(__dirname, '../', 'uploads', 'offer', offer.offer_image)                    
                 }
             }
             else {
@@ -366,8 +457,9 @@ exports.searchoffer = async (req, resp) => {
                         wellness_product_name: offer.wellness_product_id.wellness_product_name,
                         offer_code: offer.offer_code,
                         percentage: offer.percentage,
-                        description: offer.description
-
+                        description: offer.description,
+                        offer_image: offer.offer_image,
+                        i_path: path.join(__dirname, '../', 'uploads', 'offer', offer.offer_image)
                     }
                 else {
                     if (offer.beauty_product_id)
@@ -376,7 +468,9 @@ exports.searchoffer = async (req, resp) => {
                             beauty_product_name: offer.beauty_product_id.beauty_product_name,
                             offer_code: offer.offer_code,
                             percentage: offer.percentage,
-                            description: offer.description
+                            description: offer.description,
+                            offer_image: offer.offer_image,
+                            i_path: path.join(__dirname, '../', 'uploads', 'offer', offer.offer_image)
                         }
                 }
             }

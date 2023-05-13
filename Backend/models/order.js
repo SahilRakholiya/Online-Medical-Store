@@ -7,23 +7,47 @@ const orderSchema = new mongoose.Schema({
         required:true,
         ref:'users'
     },
-    medicine_id : {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'medicines'
-    },
-    wellness_product_id:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'wellness_products'
-    },
-    beauty_product_id:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'beauty_products'
-    },
-    total_amount:{
-        type:Number,
+    orders:[{
+        medicine_id : {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'medicines'
+        },
+        wellness_product_id:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'wellness_products'
+        },
+        beauty_product_id:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'beauty_products'
+        },
+        offer_id:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'offers'
+        },
+        quantity:{
+            type:Number,
+            required:true
+        },
+        total_amount:{
+            type:Number,
+            required:true
+        }
+        
+    }],
+    date:{
+        type:Date,
         required:true
     },
-    quanity:{
+    dispatch:{
+        type:Boolean,
+        required:true,
+        default:false        
+    },
+    address:{
+        type:String,
+        required:true
+    },
+    order_total_amount:{
         type:Number,
         required:true
     }

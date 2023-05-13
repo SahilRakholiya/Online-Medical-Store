@@ -1,8 +1,9 @@
 require('./config/connection');
 const express=require('express');
 const app=express();
+const cors = require('cors')
 
-
+app.use(cors())
 app.use(express.json());
 
 
@@ -18,7 +19,6 @@ const order_route=require('./routes/orderRoutes');
 const feedback_route=require('./routes/feedbackRoutes');
 
 
-
 app.use('/user',user_route);
 app.use('/medicine',medicine_route);
 app.use('/wellnesscategory',wellness_category_route);
@@ -27,7 +27,8 @@ app.use('/beautycategory',beauty_category_route);
 app.use('/beautyproduct',beauty_product_route);
 app.use('/offer',offer_route);
 app.use('/cart',cart_route);
-// app.use('/order',order_route);
+app.use('/order',order_route);
+// app.use('/finalorder',final_order_route);
 app.use('/feedback',feedback_route);
 
 

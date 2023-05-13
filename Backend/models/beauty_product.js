@@ -14,6 +14,10 @@ const beautyProductSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
+    company:{
+        type:String,
+        required:true
+    },
     beauty_category_id:{
         type:mongoose.Schema.Types.ObjectId,
         required:true,

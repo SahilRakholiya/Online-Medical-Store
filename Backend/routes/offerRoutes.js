@@ -26,7 +26,7 @@ const {displayoffer,insertoffer,updateoffer,deleteoffer,searchoffer}=require('..
 routes.get('/display',displayoffer);
 routes.delete('/delete/:id',deleteoffer);
 routes.post('/insert',upload.single("user_file"),insertoffer);
-routes.put('/update/:id',updateoffer);
+routes.put('/update/:id',upload.single("user_file"),updateoffer);
 routes.get('/search/:code',searchoffer);
 
 module.exports =routes;
